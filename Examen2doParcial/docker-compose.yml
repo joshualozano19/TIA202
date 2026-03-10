@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    # Mapeo de puertos: puerto_local:puerto_contenedor
+    ports:
+      - "8000:8000"
+    # Sincroniza tu carpeta actual con la del contenedor (útil para desarrollo)
+    volumes:
+      - .:/code
+    # Evita que Python guarde archivos .pyc y permite ver logs en tiempo real
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
