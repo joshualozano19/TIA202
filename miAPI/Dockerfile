@@ -1,20 +1,20 @@
-#importar base de python
+#importar la imagen base de python 
 FROM python:3.12-slim
 
-#Crear en el contenedor - Carpeta de trabajo
+#crear en el contenedor una carpeta de trabajo
 WORKDIR /app
 
-#Copiar los requerimientos al contenedor
+#copiar requerimientos al contenedor
 COPY requirements.txt .
 
-#Instalar las dependencias de FASTAPI
+#instalar las dependencias de Fastapi
 RUN pip install --no-cache-dir -r requirements.txt
 
-#Copiar el codigo del servidor
-COPY  . .
+#copiar el codigo del servidor 
+COPY ./app ./app
 
 #Exponer el puerto de trabajo
 EXPOSE 5000
 
-#Comando a ejecutar para levantar el servidor
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+#comando a ejecutar 
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
