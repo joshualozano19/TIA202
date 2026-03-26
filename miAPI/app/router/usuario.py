@@ -11,24 +11,48 @@ router = APIRouter(
     tags=["HTTP CRUD"]
 )
 
-# 1. Leer todos (GET)
 @router.get("/")
 async def leer_usuarios(db: Session = Depends(get_db)):
-    queryUsuarios = db.query(dbUsuario).all()
+    query_usuarios = db.query(dbUsuario).all()
+
+    usuarios_json = [
+        {
+            "id": usr.id,
+            "nombre": usr.nombre,
+            "edad": usr.edad
+        }
+        for usr in query_usuarios
+    ]
+
     return {
-        "status": "200",
-        "total": len(queryUsuarios),
-        "usuarios": queryUsuarios
+        "status": 200,
+        "total": len(usuarios_json),
+        "usuarios": usuarios_json
     }
 
-# 2. Crear (POST)
+@router.get("/{usuario_id}")
+async def leer_usuario_por_id(usuario_id: int, db: Session = Depends(get_db)):
+    usuario_db = db.query(dbUsuario).filter(dbUsuario.id == usuario_id).first()
+
+    if not usuario_db:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    return {
+        "status": 200,
+        "usuario": {
+            "id": usuario_db.id,
+            "nombre": usuario_db.nombre,
+            "edad": usuario_db.edad
+        }
+    }
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def crear_usuario(usuarioP: CrearUsuario, db: Session = Depends(get_db)):
-    nuevoU = dbUsuario(nombre=usuarioP.nombre, edad=usuarioP.edad)
-    db.add(nuevoU)
+async def agregar_usuarios(usuarioP: CrearUsuario, db: Session = Depends(get_db)):
+    nuevo_usuario = dbUsuario(nombre=usuarioP.nombre, edad=usuarioP.edad)
+    db.add(nuevo_usuario)
     db.commit()
-    db.refresh(nuevoU)
-    return {"mensaje": "Usuario Agregado", "Usuario": nuevoU}
+    db.refresh(nuevo_usuario)
+    return {"mensaje": "Usuario Agregado", "Usuario": nuevo_usuario}
 
 # 3. Actualizar completo (PUT)
 @router.put("/{usuario_id}")
